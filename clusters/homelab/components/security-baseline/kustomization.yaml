@@ -3,4 +3,4 @@ kind: Component
 resources:
   - allow-dns.yaml
   - default-deny-all.yaml
-  - default-service-account
+  - default-service-account.yaml
