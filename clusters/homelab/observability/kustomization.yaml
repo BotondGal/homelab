@@ -4,3 +4,7 @@ namespace: observability
 
 resources:
 - namespace.yaml
+
+components:
+- ../components/quota-medium
+- ../components/security-baseline
