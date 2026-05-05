@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+  namespace: observability
+spec:
+  serviceName: clickhouse
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      nodeSelector:
+        storage: local-ssd
+
+      securityContext:
+        fsGroup: 101          # clickhouse:clickhouse im Image
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 101
+        runAsUser: 101
+        runAsNonRoot: true
+
+      initContainers:
+        - name: init-sql
+          image: clickhouse/clickhouse-server:26.2-alpine
+          command:
+            - sh
+            - -c
+            - cp /initdb/*.sql /docker-entrypoint-initdb.d/
+          volumeMounts:
+            - name: initdb-source
+              mountPath: /initdb
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:26.2-alpine
+          ports:
+            - containerPort: 8123
+              name: http
+            - containerPort: 9000
+              name: native
+          env:
+            - name: CLICKHOUSE_USER
+              value: default
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              value: "1"
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 250m
+            limits:
+              memory: 3Gi
+              cpu: 2000m
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+            - name: config
+              mountPath: /etc/clickhouse-server/config.d/logging.xml
+              subPath: logging.xml
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: tmp
+              mountPath: /tmp/clickhouse
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          
+
+
+      volumes:
+        - name: config
+          configMap:
+            name: clickhouse-config
+        - name: initdb-source
+          configMap:
+            name: clickhouse-config
+        - name: initdb
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 30Gi
