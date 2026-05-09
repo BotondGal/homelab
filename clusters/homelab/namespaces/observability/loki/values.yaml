@@ -67,7 +67,7 @@ monitoring:
   serviceMonitor:
     enabled: true
     labels:
-      release: kube-prometheus-stack
+      release: kube-prometheus
 minio:
   enabled: false
 test:
