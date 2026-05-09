@@ -1,0 +1,77 @@
+nameOverride: prometheus
+fullnameOverride: prometheus
+crds:
+  enabled: true
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+prometheusOperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  kubeletService:
+    enabled: false
+prometheus:
+  enabled: true
+  prometheusSpec:
+    retention: 14d
+    enableRemoteWriteReceiver: true
+    enableFeatures:
+      - remote-write-receiver
+    resources:
+      requests:
+        cpu: 200m
+        memory: 200Mi
+      limits:
+        cpu: 200m
+        memory: 500Mi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+    affinity: 
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: storage
+              operator: In
+              values:
+              - local-ssd
+kubeApiServer:
+  enabled: false
+kubelet:
+  enabled: false
+coreDns:
+  enabled: true
+kubeDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+nodeExporter:
+  enabled: true
+  operatingSystems:
+    linux:
+      enabled: true
+    aix:
+      enabled: false
+    darwin:
+      enabled: false
+prometheus-node-exporter:
+  extraArgs:
+  - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/.+|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+  - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|erofs)$

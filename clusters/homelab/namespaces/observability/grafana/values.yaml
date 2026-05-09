@@ -1,0 +1,50 @@
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 128Mi
+  limits:
+    cpu: 2
+    memory: 512Mi
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: loki
+      type: loki
+      url: http://loki-gateway.observability.svc.cluster.local
+      isDefault: false
+      editable: false
+    - name: prometheus
+      type: prometheus
+      url: http://prometheus-prometheus.observability.svc.cluster.local:9090
+      isDefault: true
+      editable: false
+ingress:
+  enabled: false
+persistence:
+  accessModes:
+  - ReadWriteOnce
+  enabled: true
+  finalizers:
+  - kubernetes.io/pvc-protection
+  size: 5Gi
+  storageClassName: local-path
+  type: pvc
+affinity: 
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: storage
+          operator: In
+          values:
+          - local-ssd
+replicas: 1
+service:
+  enabled: true
+  port: 80
+  targetPort: 3000
+  type: ClusterIP
+initChownData:
+  enabled: false

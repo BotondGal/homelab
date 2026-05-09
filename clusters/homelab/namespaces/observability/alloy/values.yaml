@@ -1,0 +1,25 @@
+alloy:
+  configMap:
+    create: false
+    name: alloy-config
+    key: config.alloy
+  enableReporting: false
+  mounts:
+    varlog: true
+    extra:
+      - name: audit-log
+        mountPath: /var/audit-log
+        readOnly: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+controller:
+  volumes:
+    extra:
+      - name: audit-log
+        hostPath:
+          path: /var/lib/rancher/k3s/log

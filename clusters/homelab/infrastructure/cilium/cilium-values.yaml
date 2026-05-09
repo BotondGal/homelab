@@ -67,6 +67,9 @@ gatewayAPI:
 envoy:
   securityContext:
     capabilities:
-      keepCapNetBindService: true
       envoy:
-      - NET_BIND_SERVICE
+        - NET_ADMIN
+        - SYS_ADMIN
+        - NET_BIND_SERVICE
+      keepCapNetBindService: true
+      
