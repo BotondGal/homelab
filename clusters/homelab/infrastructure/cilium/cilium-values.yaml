@@ -24,8 +24,11 @@ socketLB:
   enabled: true
 
 # === Routing ===
-routingMode: tunnel
-tunnelProtocol: vxlan
+routingMode: native
+autoDirectNodeRoutes: false
+ipv4NativeRoutingCIDR: "10.42.0.0/16"   # Pod-CIDR
+mtu: 1500
+devices: "eno+"
 
 # === Hubble: Network Observability ===
 hubble:
