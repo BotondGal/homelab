@@ -1,0 +1,51 @@
+fullnameOverride: text-embeddings
+image:
+  repository: ghcr.io/huggingface/text-embeddings-inference
+  tag: "cpu-1.9"
+  pullPolicy: IfNotPresent
+config:
+  modelID: google/embeddinggemma-300m
+env:
+- name: HF_TOKEN
+  valueFrom:
+    secretKeyRef: 
+      name: huggingface
+      key: hf_token
+- name: JSON_OUTPUT
+  value: "true"
+resources:
+  requests:
+    memory: 1500Mi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+    cpu: 4
+volumeMounts:
+- name: model-cache
+  mountPath: /data
+volumes:
+- name: model-cache
+  persistentVolumeClaim:
+    claimName: embeddinggemma-models-pvc
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 120
+  periodSeconds: 60
+  timeoutSeconds: 10
+  failureThreshold: 5
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  additionalLabels:
+    release: kube-prometheus

@@ -1,0 +1,31 @@
+fullnameOverride: postgres
+image:
+  repository: pgvector/pgvector
+  tag: 0.8.2-pg18-trixie
+resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+persistence:
+  accessModes:
+  - ReadWriteOnce
+  enabled: true
+  size: 20Gi
+  storageClass: local-path
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    selector:
+      release: kube-prometheus
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: storage
+          operator: In
+          values:
+          - local-ssd
