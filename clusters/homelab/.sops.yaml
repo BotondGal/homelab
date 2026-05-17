@@ -1,0 +1,8 @@
+creation_rules:
+  # Alle Dateien unter secrets/ verschlüsseln
+  - path_regex: ^secrets/.*\.yaml$
+    age: age13u5hjfgzvxkfsleme5vfz9drnk9jevevw56sulg8z9q5zepe6gjqw7x06d
+
+  # Alternativ: Alle Dateien die "secret" im Namen haben
+  - path_regex: .*\.secret\.yaml$
+    age: age13u5hjfgzvxkfsleme5vfz9drnk9jevevw56sulg8z9q5zepe6gjqw7x06d

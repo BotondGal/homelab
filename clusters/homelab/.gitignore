@@ -1,0 +1,8 @@
+
+# Klartext-Secrets niemals committen
+*.secret.yaml
+*.plain.yaml
+secrets/**/*.yaml
+
+# Ausnahme: .enc.yaml-Dateien sind verschlüsselt → ok
+!secrets/**/*.enc.yaml   
