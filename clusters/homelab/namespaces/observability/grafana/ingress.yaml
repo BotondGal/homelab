@@ -5,7 +5,7 @@ metadata:
   name: grafana
   namespace: observability
   annotations:
-    tailscale.com/proxy-class: default
+    tailscale.com/proxy-group: ts-ingress
 spec:
   defaultBackend:
     service:
