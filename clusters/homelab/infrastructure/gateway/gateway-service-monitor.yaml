@@ -1,0 +1,19 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus
+  name: ts-gateway-metrics
+  namespace: gateway
+spec:
+  endpoints:
+  - port: metrics
+  jobLabel: tailscale_metrics
+  namespaceSelector:
+    matchNames:
+    - gateway
+  selector:
+    matchLabels:
+      tailscale.com/managed: "true"
+      tailscale.com/parent-resource-type: proxygroup
