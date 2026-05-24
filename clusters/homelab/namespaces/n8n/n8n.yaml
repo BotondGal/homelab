@@ -1,0 +1,56 @@
+db:
+  type: postgresdb
+externalPostgresql:
+  database: n8n
+  existingSecret: n8n-db
+  host: postgres.postgres.svc.cluster.local
+  port: 5432
+  username: n8n
+ingress:
+  enabled: false
+main:
+  extraEnvVars:
+    N8N_LOG_OUTPUT: json
+    N8N_LOG_LEVEL: info
+  persistence:
+    enabled: true
+    volumeName: "n8n-binary-data"
+    mountPath: "/home/node/.n8n"
+    size: 10Gi
+    accessMode: ReadWriteOnce
+    storageClass: local-path
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    failureThreshold: 30
+    httpGet:
+      path: /healthz
+      port: http
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    failureThreshold: 3
+    httpGet:
+      path: /healthz/readiness
+      port: http
+binaryData:
+  mode: filesystem
+  localStoragePath: "/home/node/.n8n/binary-data"
+service:
+  enabled: true
+serviceMonitor:
+  enabled: true
+  interval: 10s
+  timeout: 5s
+  labels:
+    release: kube-prometheus
+  include:
+    defaultMetrics: true
+    cacheMetrics: true
