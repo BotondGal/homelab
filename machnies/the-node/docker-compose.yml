@@ -44,3 +44,22 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     runtime: nvidia
+
+  text-embeddings:
+    image: ghcr.io/huggingface/text-embeddings-inference:120-1.9
+    container_name: text-embeddings
+    restart: unless-stopped
+    ports:
+      - "${TS_IP}:8001:80"
+    command:
+      - --model-id
+      - /data/embeddinggemma-300m
+      - --served-model-name
+      - google/embeddinggemma-300m
+      - --json-output
+    volumes:
+      - /opt/tei/models:/data:ro
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    runtime: nvidia
