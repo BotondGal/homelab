@@ -1,0 +1,16 @@
+[Unit]
+Description=llm docker compose stack
+Requires=docker.service tailscaled.service
+After=docker.service tailscaled.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/botond/Dev/homelab/machnies/the-node
+ExecStart=/home/botond/Dev/homelab/machnies/the-node/start.sh
+ExecStop=/usr/bin/docker compose down
+TimeoutStartSec=90
+
+[Install]
+WantedBy=multi-user.target
