@@ -1,0 +1,7 @@
+
+
+# helm upgrade -i --create-namespace \
+#   --namespace agentgateway-system \
+#   --version 0.0.0-latest-dev agentgateway-crds oci://cr.agentgateway.dev/charts/agentgateway-crds
+
+# helm upgrade -i -n agentgateway-system agentgateway oci://cr.agentgateway.dev/charts/agentgateway --version 1.4.1

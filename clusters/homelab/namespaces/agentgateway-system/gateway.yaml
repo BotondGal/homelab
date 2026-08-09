@@ -1,0 +1,28 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: agentgateway-proxy
+spec:
+  gatewayClassName: agentgateway
+  infrastructure:
+    parametersRef:
+      name: agentgateway-config
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+  listeners:
+  - protocol: HTTP
+    port: 8080
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayParameters
+metadata:
+  name: agentgateway-config
+spec:
+  service:
+    spec:
+      type: ClusterIP
