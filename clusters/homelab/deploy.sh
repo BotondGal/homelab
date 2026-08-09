@@ -11,7 +11,7 @@ fi
 
 echo "▶ Deploying $TARGET..."
 
-find secrets/ -name "*.enc.yaml" | while read -r secret_file; do
+find $TARGET/ -name "*.enc.yaml" | while read -r secret_file; do
   echo "  🔑 Applying secret: $secret_file"
   sops --decrypt "$secret_file" | kubectl apply -f -
 done
