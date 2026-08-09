@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openwebui-config
+  labels:
+    app: openwebui
+data:
+  WEBUI_AUTH: "true"
+  ENABLE_SIGNUP: "false"
+  DATA_DIR: /app/backend/data
+  ENABLE_OLLAMA_API: "false"
+  ENABLE_OPENAI_API: "true"
