@@ -1,11 +1,11 @@
-
+# helm upgrade -i -n observability grafana grafana-community/grafana --version 12.10.4 --values namespaces/observability/grafana/values.yaml
 resources:
   requests:
     cpu: 200m
     memory: 128Mi
   limits:
     cpu: 2
-    memory: 512Mi
+    memory: 2Gi
 datasources:
   datasources.yaml:
     apiVersion: 1
