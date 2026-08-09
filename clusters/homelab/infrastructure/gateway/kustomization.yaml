@@ -6,3 +6,4 @@ resources:
 - gateway-service-monitor.yaml
 - namespace.yaml
 - proxy.yaml
+- proxy-node.yaml
