@@ -1,0 +1,120 @@
+image:
+  repository: ghcr.io/botondgal/content-hub
+  tag: sha-c71126e
+  pullPolicy: IfNotPresent
+
+# List of existing pull-secret names, e.g. [{name: ghcr-pull-secret}]
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+serviceAccount:
+  create: true
+
+# Database credentials.
+# Set url + leave existingSecret empty, OR reference an existing K8s Secret.
+database:
+  # url: ""
+  existingSecret: content
+  existingSecretKey: database-url
+
+# API key used for X-Api-Key header authentication.
+apiKey:
+  # value: ""
+  existingSecret: content
+  existingSecretKey: api-key
+
+# External TEI embedding service
+tei:
+  baseUrl: http://text-embeddings.embeddings.svc.cluster.local
+
+# Non-secret application settings — all optional, these are the config.py defaults.
+settings:
+  dbPoolMin: 2
+  dbPoolMax: 10
+  maxFetchAttempts: 5
+  maxEmbedAttempts: 5
+  defaultRssPollInterval: 900
+  chunkMaxTokens: 512
+  chunkOverlapTokens: 64
+  # Global log level applied to all containers unless overridden per-component below.
+  # Valid values: DEBUG, INFO, WARNING, ERROR
+  logLevel: INFO
+
+# ---------------------------------------------------------------------------
+# Workloads
+# ---------------------------------------------------------------------------
+
+api:
+  enabled: true
+  replicas: 1
+  logLevel: ""  # overrides settings.logLevel when non-empty
+  resources:
+    requests:
+      cpu: 250m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  service:
+    type: ClusterIP
+    port: 8000
+
+# MCP server — disabled until Phase 6 is complete.
+mcp:
+  enabled: false
+  replicas: 1
+  logLevel: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+  service:
+    type: ClusterIP
+    port: 8080
+
+poller:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+
+fetcher:
+  enabled: false
+  replicas: 1
+  logLevel: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+# The embed worker is intentionally single-instance (serial by design).
+# Setting replicas > 1 will cause helm install/upgrade to fail.
+embedder:
+  enabled: false
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+
+migrate:
+  enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# ---------------------------------------------------------------------------
+# NetworkPolicy — disabled by default, enable per overlay.
+# ---------------------------------------------------------------------------
+networkPolicy:
+  enabled: false
