@@ -1,3 +1,6 @@
+# Last upgrade: 
+# helm upgrade --install cilium -n kube-system cilium/cilium --version=1.20.0 --values infrastructure/cilium/cilium-values.yaml
+
 # === Cluster-Identifikation ===
 cluster:
   name: homelab
@@ -37,6 +40,20 @@ hubble:
     enabled: true
   ui:
     enabled: true
+    frontend:
+      resources:
+        requests:
+          memory: 32Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
+    backend:
+      resources:
+        requests:
+          memory: 32Mi
+        limits:
+          cpu: 50m
+          memory: 128Mi
   metrics:
     enabled:
       - dns:query;ignoreAAAA
@@ -46,11 +63,13 @@ hubble:
       - icmp
       - http
 
-# === Prometheus-Metriken für Grafana ===
+# === Prometheus-Metriken ===
 prometheus:
   enabled: true
   serviceMonitor:
-    enabled: false  # Auf true setzen wenn Prometheus Operator läuft
+    enabled: true
+    labels:
+      release: kube-prometheus
 
 # === Security-Features ===
 # Network Policies aktiviert (Standard)
@@ -68,6 +87,12 @@ gatewayAPI:
     enabled: true
 
 envoy:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
   securityContext:
     capabilities:
       envoy:
@@ -75,4 +100,10 @@ envoy:
         - SYS_ADMIN
         - NET_BIND_SERVICE
       keepCapNetBindService: true
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      labels:
+        release: kube-prometheus
       
