@@ -1,7 +1,10 @@
 image:
   repository: ghcr.io/botondgal/content-hub
-  tag: sha-c71126e
+  tag: sha-bab07bc
   pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
 
 # List of existing pull-secret names, e.g. [{name: ghcr-pull-secret}]
 imagePullSecrets:
@@ -9,6 +12,7 @@ imagePullSecrets:
 
 serviceAccount:
   create: true
+  name: ""
 
 # Database credentials.
 # Set url + leave existingSecret empty, OR reference an existing K8s Secret.
@@ -76,6 +80,7 @@ mcp:
 poller:
   enabled: true
   replicas: 1
+  logLevel: ""
   resources:
     requests:
       cpu: 100m
@@ -84,7 +89,7 @@ poller:
       memory: 128Mi
 
 fetcher:
-  enabled: false
+  enabled: true
   replicas: 1
   logLevel: ""
   resources:
@@ -99,6 +104,7 @@ fetcher:
 embedder:
   enabled: false
   replicas: 1
+  logLevel: ""
   resources:
     requests:
       cpu: 500m
@@ -108,6 +114,7 @@ embedder:
 
 migrate:
   enabled: false
+  logLevel: ""
   resources:
     requests:
       cpu: 100m
@@ -117,4 +124,4 @@ migrate:
 # NetworkPolicy — disabled by default, enable per overlay.
 # ---------------------------------------------------------------------------
 networkPolicy:
-  enabled: false
+  enabled: true
