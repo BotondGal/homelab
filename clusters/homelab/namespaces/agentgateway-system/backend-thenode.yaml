@@ -12,6 +12,10 @@ spec:
     - path:
         type: PathPrefix
         value: /v1/chat/completions
+      headers:
+      - type: RegularExpression
+        name: x-model
+        value: "^the-node/.*"
     backendRefs:
     - name: the-node-llm
       namespace: agentgateway-system
@@ -23,6 +27,19 @@ spec:
         value: /v1/embeddings
     backendRefs:
     - name: the-node-embeddings
+      namespace: agentgateway-system
+      group: agentgateway.dev
+      kind: AgentgatewayBackend
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /v1/responses
+      headers:
+      - type: RegularExpression
+        name: x-model
+        value: "^the-node/.*"
+    backendRefs:
+    - name: the-node-responses
       namespace: agentgateway-system
       group: agentgateway.dev
       kind: AgentgatewayBackend
@@ -42,9 +59,10 @@ spec:
   policies:
     auth:
       secretRef:
-       name: the-nodeai
-    modelAliases: 
-      the-node/gemma4-12b: unsloth/gemma-4-12B-it-GGUF
+       name: the-node
+    ai:
+      modelAliases:
+        the-node/gemma4-12b: unsloth/gemma-4-12B-it-GGUF
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -61,5 +79,30 @@ spec:
       host: the-node.gateway.svc.cluster.local
       port: 8001
   policies:
-    modelAliases: 
-      the-node/embeddinggemma-300m: google/embeddinggemma-300m
+    ai:
+      routes:
+        "*": Embeddings
+      modelAliases:
+        the-node/embeddinggemma-300m: google/embeddinggemma-300m
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: the-node-responses
+spec:
+  ai:
+    provider:
+      openai:
+        model: unsloth/gemma-4-12B-it-GGUF
+      host: the-node.gateway.svc.cluster.local
+      port: 8000
+      path: /v1/responses
+  policies:
+    auth:
+      secretRef:
+       name: the-node
+    ai:
+      routes:
+        "*": Responses
+      modelAliases:
+        the-node/gemma4-12b: unsloth/gemma-4-12B-it-GGUF

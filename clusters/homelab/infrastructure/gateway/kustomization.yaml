@@ -7,3 +7,5 @@ resources:
 - namespace.yaml
 - proxy.yaml
 - proxy-node.yaml
+- allow-from-agentgateway.yaml
+- allow-prometheus-scraping.yaml

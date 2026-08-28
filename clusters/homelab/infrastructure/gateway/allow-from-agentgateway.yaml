@@ -1,0 +1,24 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-agentgateway
+spec:
+  podSelector:
+    matchLabels:
+      tailscale.com/parent-resource: egress-proxies
+      tailscale.com/parent-resource-type: proxygroup
+  policyTypes:
+    - Ingress
+  # Kein Port-Filter: der Tailscale-Operator vergibt für jedes Egress-Ziel einen
+  # zufälligen internen Port (z.B. 8000 -> 10304), der sich bei jeder Neukonfiguration
+  # ändern kann. Laut Tailscale (github.com/tailscale/tailscale#15759) ist eine
+  # portgenaue NetworkPolicy dafür aktuell nicht zuverlässig möglich.
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: agentgateway-system
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: agentgateway-proxy

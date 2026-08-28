@@ -4,16 +4,33 @@ kind: ServiceMonitor
 metadata:
   labels:
     release: kube-prometheus
-  name: ts-gateway-metrics
+  name: ts-ingress-metrics
   namespace: gateway
 spec:
   endpoints:
   - port: metrics
-  jobLabel: tailscale_metrics
+  jobLabel: tailscale_ingress
   namespaceSelector:
     matchNames:
     - gateway
   selector:
     matchLabels:
-      tailscale.com/managed: "true"
-      tailscale.com/parent-resource-type: proxygroup
+      tailscale.com/metrics-target: ts-ingress
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus
+  name: ts-egress-metrics
+  namespace: gateway
+spec:
+  endpoints:
+  - port: metrics
+  jobLabel: tailscale_egress
+  namespaceSelector:
+    matchNames:
+    - gateway
+  selector:
+    matchLabels:
+      tailscale.com/metrics-target: egress-proxies
