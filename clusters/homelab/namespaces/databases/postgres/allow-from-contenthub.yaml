@@ -15,7 +15,6 @@ spec:
             kubernetes.io/metadata.name: content
       - podSelector:
           matchLabels:
-            app.kubernetes.io/component: api
             app.kubernetes.io/name: content-hub
       ports:
       - protocol: TCP

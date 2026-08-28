@@ -1,7 +1,10 @@
+---
+# helm upgrade --install -n postgres postgres oci://registry-1.docker.io/cloudpirates/postgres --version 0.20.2 --values clusters/homelab/namespaces/databases/postgres/values.yaml
 fullnameOverride: postgres
 image:
   repository: pgvector/pgvector
-  tag: 0.8.2-pg18-trixie
+  tag: 0.8.6-pg18-trixie
+replicaCount: 2
 resources:
     limits:
       memory: 2Gi
