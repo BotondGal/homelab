@@ -20,5 +20,9 @@ spec:
           matchLabels:
             kubernetes.io/metadata.name: agentgateway-system
         podSelector:
-          matchLabels:
-            app.kubernetes.io/name: agentgateway-proxy
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - agentgateway-chat
+            - agentgateway-embeddings

@@ -4,5 +4,7 @@ namespace: agentgateway-system
 
 resources:
 - backend-thenode.yaml
-- gateway.yaml
+- gateway-chat.yaml
+- gateway-embeddings.yaml
+- models-thenode.yaml
 - namespace.yaml

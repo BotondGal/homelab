@@ -2,25 +2,11 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: the-node
+  name: the-node-embeddings
 spec:
   parentRefs:
-    - name: agentgateway-proxy
-      namespace: agentgateway-system
+    - name: agentgateway-embeddings
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /v1/chat/completions
-      headers:
-      - type: RegularExpression
-        name: x-model
-        value: "^the-node/.*"
-    backendRefs:
-    - name: the-node-llm
-      namespace: agentgateway-system
-      group: agentgateway.dev
-      kind: AgentgatewayBackend
   - matches:
     - path:
         type: PathPrefix
@@ -30,39 +16,6 @@ spec:
       namespace: agentgateway-system
       group: agentgateway.dev
       kind: AgentgatewayBackend
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /v1/responses
-      headers:
-      - type: RegularExpression
-        name: x-model
-        value: "^the-node/.*"
-    backendRefs:
-    - name: the-node-responses
-      namespace: agentgateway-system
-      group: agentgateway.dev
-      kind: AgentgatewayBackend
----
-apiVersion: agentgateway.dev/v1alpha1
-kind: AgentgatewayBackend
-metadata:
-  name: the-node-llm
-spec:
-  ai:
-    provider:
-      openai:
-        model: unsloth/gemma-4-12B-it-GGUF
-      host: the-node.gateway.svc.cluster.local
-      port: 8000
-      path: /v1/chat/completions
-  policies:
-    auth:
-      secretRef:
-       name: the-node
-    ai:
-      modelAliases:
-        the-node/gemma4-12b: unsloth/gemma-4-12B-it-GGUF
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -84,25 +37,3 @@ spec:
         "*": Embeddings
       modelAliases:
         the-node/embeddinggemma-300m: google/embeddinggemma-300m
----
-apiVersion: agentgateway.dev/v1alpha1
-kind: AgentgatewayBackend
-metadata:
-  name: the-node-responses
-spec:
-  ai:
-    provider:
-      openai:
-        model: unsloth/gemma-4-12B-it-GGUF
-      host: the-node.gateway.svc.cluster.local
-      port: 8000
-      path: /v1/responses
-  policies:
-    auth:
-      secretRef:
-       name: the-node
-    ai:
-      routes:
-        "*": Responses
-      modelAliases:
-        the-node/gemma4-12b: unsloth/gemma-4-12B-it-GGUF

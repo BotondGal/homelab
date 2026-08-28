@@ -1,7 +1,14 @@
 
 
-# helm upgrade -i --create-namespace \
-#   --namespace agentgateway-system \
-#   --version 0.0.0-latest-dev agentgateway-crds oci://cr.agentgateway.dev/charts/agentgateway-crds
+# helm upgrade -i --namespace agentgateway-system --version --version v1.5.0 agentgateway-crds oci://cr.agentgateway.dev/charts/agentgateway-crds
+# helm upgrade -i -n agentgateway-system agentgateway oci://cr.agentgateway.dev/charts/agentgateway --version 1.5.0 --values 
 
-# helm upgrade -i -n agentgateway-system agentgateway oci://cr.agentgateway.dev/charts/agentgateway --version 1.5.0
+agentgatewayModels:
+  enabled: true
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    extraLabels:
+      release: kube-prometheus
