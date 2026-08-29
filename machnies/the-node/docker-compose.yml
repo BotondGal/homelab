@@ -35,6 +35,8 @@ services:
       - q8_0
       - --flash-attn
       - "on"
+      - --mmproj 
+      - /models/unsloth/mmproj-BF16.gguf
       - --jinja
       - --metrics
       - --slots
