@@ -1,5 +1,6 @@
 # Last upgrade: 
-# helm upgrade --install cilium -n kube-system cilium/cilium --version=1.20.0 --values infrastructure/cilium/cilium-values.yaml
+# helm upgrade --install cilium -n kube-system cilium/cilium --version=1.20.1 --values infrastructure/cilium/cilium-values.yaml
+# kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/standard-install.yaml
 
 # === Cluster-Identifikation ===
 cluster:

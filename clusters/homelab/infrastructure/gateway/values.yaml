@@ -1,0 +1,1 @@
+# helm upgrade --install tailscale-operator tailscale/tailscale-operator --version 1.102.3 -n gateway
