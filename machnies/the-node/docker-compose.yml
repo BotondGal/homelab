@@ -1,6 +1,7 @@
 services:
   llama-server:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda13
+    # server-cuda13 as of 2026-08-29 - re-resolve via `docker manifest inspect` to update
+    image: ghcr.io/ggml-org/llama.cpp@sha256:85d887ab073ab471d6a33617d63d6c6566ba0f60556e4c307c63c5be71eb9683
     container_name: llama-server
     restart: unless-stopped
     ports:
@@ -10,8 +11,8 @@ services:
       - /models/unsloth/gemma-4-12b-it-Q4_K_M.gguf
       - --alias
       - unsloth/gemma-4-12B-it-GGUF
-      - --api-key
-      - LHxujYALxwThhR9U7cWzMhLimFNpaKgF
+      - --api-key-file
+      - /run/secrets/llama_api_key
       - --temp
       - "0.5"
       - --top-p
@@ -44,6 +45,14 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     runtime: nvidia
+    secrets:
+      - llama_api_key
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   text-embeddings:
     image: ghcr.io/huggingface/text-embeddings-inference:120-1.9
@@ -63,3 +72,39 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     runtime: nvidia
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  alloy:
+    image: grafana/alloy:v1.19.2
+    container_name: alloy
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      llama-server:
+        condition: service_healthy
+    environment:
+      TS_IP: ${TS_IP}
+    command:
+      - run
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./node_metrics.alloy:/etc/alloy/config.alloy:ro
+      - /:/host:ro,rslave
+      - /var/log/journal:/var/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - alloy-data:/var/lib/alloy/data
+    secrets:
+      - llama_api_key
+
+secrets:
+  llama_api_key:
+    file: ./secrets/llama_api_key.txt
+
+volumes:
+  alloy-data:

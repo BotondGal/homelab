@@ -1,0 +1,128 @@
+prometheus.exporter.unix "node_exporter" {
+  disable_collectors = ["ipvs", "btrfs", "infiniband", "xfs", "zfs"]
+  enable_collectors = ["meminfo"]
+
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+  rootfs_path = "/host"
+
+  filesystem {
+    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+    mount_timeout        = "5s"
+  }
+
+  netclass {
+    ignored_devices = "^(veth.*|[a-f0-9]{15})$"
+  }
+
+  netdev {
+    device_exclude = "^(veth.*|[a-f0-9]{15})$"
+  }
+}
+
+discovery.relabel "node_exporter" {
+  targets = prometheus.exporter.unix.node_exporter.targets
+
+  rule {
+    target_label = "job"
+    replacement = "node_exporter"
+  }
+
+  rule {
+    target_label = "host"
+    replacement = "the-node"
+  }
+}
+
+prometheus.scrape "node_exporter" {
+  scrape_interval = "15s"
+  targets    = discovery.relabel.node_exporter.output
+  forward_to = [prometheus.remote_write.k3s.receiver]
+}
+
+prometheus.scrape "llama_server" {
+  targets = [
+    {"__address__" = sys.env("TS_IP") + ":8000", "host" = "the-node"},
+  ]
+  metrics_path      = "/metrics"
+  scrape_interval   = "15s"
+  bearer_token_file = "/run/secrets/llama_api_key"
+  forward_to        = [prometheus.remote_write.k3s.receiver]
+}
+
+prometheus.scrape "text_embeddings" {
+  targets = [
+    {"__address__" = sys.env("TS_IP") + ":8001", "host" = "the-node"},
+  ]
+  metrics_path    = "/metrics"
+  scrape_interval = "15s"
+  forward_to = [prometheus.remote_write.k3s.receiver]
+}
+
+prometheus.remote_write "k3s" {
+  endpoint {
+    url = "http://minimachine:8080/prometheus/api/v1/write"
+  }
+
+  wal {
+    truncate_frequency = "30m"
+    max_keepalive_time = "2h"
+  }
+}
+
+discovery.relabel "systemd_journal" {
+  targets = []
+
+  rule {
+    target_label = "job"
+    replacement  = "systemd_journal"
+  }
+
+  rule {
+    target_label = "host"
+    replacement  = "the-node"
+  }
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+
+  rule {
+    source_labels = ["__journal__hostname"]
+    target_label  = "hostname"
+  }
+}
+
+loki.source.journal "systemd_journal_stdout" {
+  max_age       = "24h0m0s"
+  relabel_rules = discovery.relabel.systemd_journal.rules
+  matches = "_TRANSPORT=stdout"
+  forward_to    = [loki.write.local.receiver]
+}
+
+loki.source.journal "systemd_journal" {
+  max_age       = "24h0m0s"
+  relabel_rules = discovery.relabel.systemd_journal.rules
+  matches = "_TRANSPORT=journal"
+  forward_to    = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://minimachine:8080/loki/api/v1/push"
+  }
+}
+
+livedebugging{}
