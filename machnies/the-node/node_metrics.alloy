@@ -62,7 +62,7 @@ prometheus.scrape "text_embeddings" {
 
 prometheus.remote_write "k3s" {
   endpoint {
-    url = "http://minimachine:8080/prometheus/api/v1/write"
+    url = "https://prometheus.tailea8881.ts.net/api/v1/write"
   }
 
   wal {
@@ -121,7 +121,7 @@ loki.source.journal "systemd_journal" {
 
 loki.write "local" {
   endpoint {
-    url = "http://minimachine:8080/loki/api/v1/push"
+    url = "https://loki.tailea8881.ts.net/loki/api/v1/push"
   }
 }
 
