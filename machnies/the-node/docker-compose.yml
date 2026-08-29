@@ -22,11 +22,15 @@ services:
       - --gpu-layers
       - "999"
       - --ctx-size
-      - "128000"
+      - "192000"
+      - --parallel
+      - "2"
+      - --ubatch-size
+      - "1024"
       - --threads
       - "8"
       - --cache-type-k
-      - q4_0
+      - q8_0
       - --cache-type-v
       - q8_0
       - --flash-attn
