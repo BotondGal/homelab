@@ -6,5 +6,6 @@ resources:
 - backend-thenode.yaml
 - gateway-chat.yaml
 - gateway-embeddings.yaml
+- models-openrouter.yaml
 - models-thenode.yaml
 - namespace.yaml

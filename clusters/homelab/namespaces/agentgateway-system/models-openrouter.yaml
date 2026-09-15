@@ -1,0 +1,19 @@
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayModel
+metadata:
+  name: openrouter-gemma-4-26b
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: agentgateway-chat
+      sectionName: http
+  provider: OpenAI
+  baseURL: https://openrouter.ai/api/v1
+  match:
+    model: google/gemma-4-26b-a4b-it
+  policies:
+    auth:
+      secretRef:
+        name: openrouter-content
