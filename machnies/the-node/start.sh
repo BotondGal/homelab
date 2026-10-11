@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 TS_IP=""
-for i in $(seq 1 30); do
+for _ in $(seq 1 30); do
     if TS_IP=$(tailscale ip -4 2>/dev/null); then
         break
     fi

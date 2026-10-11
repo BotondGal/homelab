@@ -195,6 +195,12 @@ pull_images() {
 
 install_service() {
     log "installing llm-compose.service"
+    # An earlier manual install (copy or link to another path) would make `enable` fail
+    local installed=/etc/systemd/system/llm-compose.service
+    if [[ -e $installed || -L $installed ]] && [[ $(readlink -f "$installed") != "$UNIT_FILE" ]]; then
+        warn "replacing existing $installed (backup: $installed.bak)"
+        mv -f "$installed" "$installed.bak"
+    fi
     systemctl enable "$UNIT_FILE"   # symlinks the unit from the repo, so a git pull also updates it
     systemctl daemon-reload
     if (( START )); then
