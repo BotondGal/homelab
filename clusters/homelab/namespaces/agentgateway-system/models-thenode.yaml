@@ -17,3 +17,7 @@ spec:
     auth:
       secretRef:
         name: the-node
+    health:
+      eviction:
+        consecutiveFailures: 2
+        duration: 2m

@@ -46,7 +46,7 @@ services:
       - --port
       - "8000"
     volumes:
-      - /opt/llamacpp/models:/models:ro
+      - /srv/llamacpp/models:/models:ro
     environment:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
@@ -66,14 +66,14 @@ services:
     restart: unless-stopped
     ports:
       - "${TS_IP}:8001:80"
-    command:
+    command: 
       - --model-id
       - /data/embeddinggemma-300m
       - --served-model-name
       - google/embeddinggemma-300m
       - --json-output
     volumes:
-      - /opt/tei/models:/data:ro
+      - /srv/tei/models:/data:ro
     environment:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
