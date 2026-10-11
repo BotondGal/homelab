@@ -26,6 +26,9 @@ TEI_REPO=google/embeddinggemma-300m
 TEI_REQUIRED=(config.json tokenizer.json modules.json model.safetensors)
 TEI_SKIP='^(\.gitattributes|README\.md|notebook\.ipynb)$'
 
+# Tailnet name the cluster's egress Service targets (infrastructure/gateway/proxy-node.yaml)
+EXPECTED_TS_FQDN=gpu-node.tailea8881.ts.net
+
 HEALTH_TIMEOUT=600
 
 log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -60,6 +63,12 @@ preflight() {
     TS_IP=$(tailscale ip -4 2>/dev/null | head -n1) || true
     [[ -n ${TS_IP:-} ]] || die "tailscale is not connected (run 'tailscale up')"
     log "tailscale IP $TS_IP"
+
+    local fqdn
+    fqdn=$(tailscale status --json | python3 -c 'import json, sys
+print(json.load(sys.stdin)["Self"]["DNSName"].rstrip("."))') || true
+    [[ $fqdn == "$EXPECTED_TS_FQDN" ]] ||
+        warn "tailnet name is '${fqdn:-unknown}', the cluster expects $EXPECTED_TS_FQDN (clusters/homelab/infrastructure/gateway/proxy-node.yaml)"
 }
 
 setup_dirs() {

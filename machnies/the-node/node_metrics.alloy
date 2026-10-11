@@ -31,7 +31,7 @@ discovery.relabel "node_exporter" {
 
   rule {
     target_label = "host"
-    replacement = "the-node"
+    replacement = "gpu-node"
   }
 }
 
@@ -43,7 +43,7 @@ prometheus.scrape "node_exporter" {
 
 prometheus.scrape "llama_server" {
   targets = [
-    {"__address__" = sys.env("TS_IP") + ":8000", "host" = "the-node"},
+    {"__address__" = sys.env("TS_IP") + ":8000", "host" = "gpu-node"},
   ]
   metrics_path      = "/metrics"
   scrape_interval   = "15s"
@@ -53,7 +53,7 @@ prometheus.scrape "llama_server" {
 
 prometheus.scrape "text_embeddings" {
   targets = [
-    {"__address__" = sys.env("TS_IP") + ":8001", "host" = "the-node"},
+    {"__address__" = sys.env("TS_IP") + ":8001", "host" = "gpu-node"},
   ]
   metrics_path    = "/metrics"
   scrape_interval = "15s"
@@ -81,7 +81,7 @@ discovery.relabel "systemd_journal" {
 
   rule {
     target_label = "host"
-    replacement  = "the-node"
+    replacement  = "gpu-node"
   }
 
   rule {

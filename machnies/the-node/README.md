@@ -4,6 +4,10 @@ GPU-Host (Linux, NVIDIA, Tailscale) mit llama.cpp (Chat, Port 8000), text-embedd
 und Grafana Alloy (Metriken/Logs). Die Dienste sind nur über die Tailscale-IP erreichbar; der
 agentgateway im Cluster spricht sie von dort an (siehe `clusters/homelab/namespaces/agentgateway-system`).
 
+`the-node` ist der logische Name in Cluster und Repo; der Tailnet-Hostname ist `gpu-node`
+(`gpu-node.tailea8881.ts.net`). Dieser Name steht in `clusters/homelab/infrastructure/gateway/proxy-node.yaml`
+und muss mit dem Hostnamen im Tailnet übereinstimmen (`setup.sh` warnt bei Abweichung).
+
 ## Voraussetzungen (manuell, einmalig)
 
 - Docker mit Compose-Plugin und `nvidia-container-toolkit` (Runtime `nvidia`), NVIDIA-Treiber ≥ 580 (CUDA 13)

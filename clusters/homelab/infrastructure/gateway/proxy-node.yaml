@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: the-node
   annotations:
-    tailscale.com/tailnet-fqdn: "the-node.tailea8881.ts.net"
+    tailscale.com/tailnet-fqdn: "gpu-node.tailea8881.ts.net"
     tailscale.com/proxy-group: "egress-proxies"
 spec:
   type: ExternalName

@@ -52,6 +52,9 @@ Zwei getrennte Gateways bedienen zwei getrennte Zwecke (siehe [Warum zwei Gatewa
 | [the-node.enc.yaml](the-node.enc.yaml) | SOPS-verschlüsseltes `Secret the-node` (Authorization-Header für den Upstream-Server) |
 | [values.yaml](values.yaml) | Helm-Values für die `agentgateway`/`agentgateway-crds` Charts (u.a. `agentgatewayModels.enabled: true`) |
 
+`the-node` ist der logische Name (Service, Modelle, Secret); der Rechner heißt im Tailnet `gpu-node`. Diesen Namen
+trägt die Annotation `tailscale.com/tailnet-fqdn` in `proxy-node.yaml`.
+
 Der eigentliche Netzwerkzugriff auf `the-node` läuft **nicht** über diesen Namespace, sondern über den
 Tailscale-Egress im Namespace `gateway` (`clusters/homelab/infrastructure/gateway/`):
 `proxy-node.yaml` (der `ExternalName`-Service), `allow-from-agentgateway.yaml` /
